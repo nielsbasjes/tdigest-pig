@@ -87,7 +87,8 @@ public class Merge extends EvalFunc<Tuple> implements Algebraic {
         }
         // Switch fallthrough if not a tDigest !!
       default:
-        throw new ExecException("The datatype " + tuple.getType(0) + " cannot be merged into a tDigest.");
+        throw new ExecException("The datatype " + tuple.getType(0) +
+                "(="+ DataType.findTypeName(tuple.getType(0))+") cannot be merged into a tDigest.");
     }
     return tDigest;
   }

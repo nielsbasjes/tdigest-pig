@@ -25,7 +25,7 @@ public class Utils {
     if (tDigest == null) {
       return null;
     }
-    ByteBuffer buffer = ByteBuffer.allocateDirect(100000); // 100K bytes initially
+    ByteBuffer buffer = ByteBuffer.allocate(100000); // 100K bytes initially
     tDigest.asSmallBytes(buffer);
     DataByteArray byteArray = new DataByteArray(buffer.array());
 
