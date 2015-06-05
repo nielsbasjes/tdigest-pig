@@ -12,7 +12,7 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 import static nl.basjes.pig.tdigest.Utils.unwrapTDigestFromTuple;
 import static nl.basjes.pig.tdigest.Utils.wrapTDigestIntoTuple;
 
-public class TDigestMerge extends EvalFunc<Tuple> implements Algebraic {
+public class Merge extends EvalFunc<Tuple> implements Algebraic {
 
   public Tuple exec(Tuple input) throws IOException {
     if (input == null || input.size() == 0) {
@@ -96,9 +96,8 @@ public class TDigestMerge extends EvalFunc<Tuple> implements Algebraic {
   public Schema outputSchema(Schema input) {
     try {
       Schema tupleSchema = new Schema();
-
-      tupleSchema.add(new Schema.FieldSchema("magicValue", DataType.CHARARRAY));
-      tupleSchema.add(new Schema.FieldSchema("tDigest_as_bytes", DataType.BYTEARRAY));
+//      tupleSchema.add(new Schema.FieldSchema("magicValue", DataType.CHARARRAY));
+      tupleSchema.add(new Schema.FieldSchema("tDigest", DataType.TUPLE));
       return tupleSchema;
     } catch (Exception e) {
       return null;

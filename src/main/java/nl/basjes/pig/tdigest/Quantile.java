@@ -12,7 +12,7 @@ import org.apache.pig.data.TupleFactory;
 import org.apache.pig.impl.logicalLayer.schema.Schema;
 import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
 
-public class TDigestQuantile extends EvalFunc<Tuple> {
+public class Quantile extends EvalFunc<Tuple> {
 
   // We expect a TDigest tuple and a DOUBLE or FLOAT (between 0 and 1)
   public Tuple exec(Tuple input) throws IOException {
