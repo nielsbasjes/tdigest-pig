@@ -1,11 +1,12 @@
-package nl.basjes.pig.tdigest;
+package nl.basjes.pig.stats.tdigest;
 
 import java.io.IOException;
 
 import com.tdunning.math.stats.TDigest;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.pig.EvalFunc;
 import org.apache.pig.backend.executionengine.ExecException;
-import org.apache.pig.builtin.mock.Storage;
 import org.apache.pig.data.DataType;
 import org.apache.pig.data.Tuple;
 import org.apache.pig.data.TupleFactory;
@@ -13,6 +14,7 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
 
 public class Quantile extends EvalFunc<Tuple> {
+  private static final Log LOG = LogFactory.getLog(Quantile.class);
 
   // We expect a TDigest tuple and a DOUBLE or FLOAT (between 0 and 1)
   public Tuple exec(Tuple input) throws IOException {
@@ -30,7 +32,7 @@ public class Quantile extends EvalFunc<Tuple> {
 
     TDigest tDigest = Utils.unwrapTDigestFromTuple(tDigestTuple);
     if (tDigest == null) {
-      throw new ExecException("The first parameter was NOT a tDigest tuple");
+      throw new ExecException("The first parameter was NOT a tDigest tuple.");
     }
 
     Double quantile;

@@ -1,21 +1,8 @@
-***CURRENT STATUS: It doesn't work yet ... ***
-===
-Just so you know ...
-
-
-
-
-
-
-
-
-
-
-
 T-Digest Pig UDF
 ======================
 
-This is a Pig wrapper around [t-digest](https://github.com/tdunning/t-digest).
+This is simply a pig wrapper around [T-Digest](https://github.com/tdunning/t-digest) 
+which was created by [Ted Dunning](https://twitter.com/ted_dunning).
 
 Build:
 ------
@@ -27,39 +14,37 @@ Now build and install the java version:
     cd tdigest-pig
     mvn install 
 
-NOTE: You may have to skip the testing in case there is a problem 
-
-    mvn install -DskipTests=true
-
 Usage:
 --------
-```pig
+```
 REGISTER ../target/tdigest-pig-*-udf.jar;
 
-DEFINE TDigestMerge     nl.basjes.pig.tdigest.Merge;
-DEFINE TDigestQuantile  nl.basjes.pig.tdigest.Quantile;
+DEFINE TDigestMerge     nl.basjes.pig.stats.tdigest.Merge;
+DEFINE TDigestQuantile  nl.basjes.pig.stats.tdigest.Quantile;
 
-Data = LOAD 'data.txt' AS (value:long);
+InputData = 
+    LOAD 'data.txt' 
+    AS  (value:long);
 
-GroupedData = GROUP Data ALL;
+GroupedData =
+    GROUP    InputData ALL;
 
 TDGroup =
-    FOREACH GroupedData
-    GENERATE TDigestMerge(Data.value) AS tDigest:bytearray;
+    FOREACH  GroupedData
+    GENERATE nl.basjes.pig.stats.tdigest.Merge(InputData.value) AS tDigest;
 
-TDValues =
-    FOREACH     TDGroup
-    GENERATE    TDigestQuantile(tDigest,0.9) AS Precentile9:double,
-                TDigestQuantile(tDigest,0.99) AS Precentile99:double,
-                TDigestQuantile(tDigest,0.999) AS Precentile999:double,
-                TDigestQuantile(tDigest,0.5) AS Precentile5:double;
+TDStats =
+    FOREACH  TDGroup
+    GENERATE nl.basjes.pig.stats.tdigest.Quantile(tDigest,0.90) AS Precentile90:double,
+             nl.basjes.pig.stats.tdigest.Quantile(tDigest,0.75) AS Precentile75:double,
+             nl.basjes.pig.stats.tdigest.Quantile(tDigest,0.50) AS Precentile50:double,
+             nl.basjes.pig.stats.tdigest.Quantile(tDigest,0.25) AS Precentile25:double,
+             nl.basjes.pig.stats.tdigest.Quantile(tDigest,0.10) AS Precentile10:double;
 
-DUMP TDValues;
+DUMP TDStats;
 ```
 
 Author:
 -------
 
-  * Niels Basjes [@nielsbasjes](https://twitter.com/nielsbasjes)
-
-  This is a trivial interface on top of the T-Digest created by Ted Dunning.
+  Niels Basjes [@nielsbasjes](https://twitter.com/nielsbasjes)

@@ -1,25 +1,25 @@
-package nl.basjes.pig.tdigest;
+package nl.basjes.pig.stats.tdigest;
 
 import java.io.IOException;
 
 import com.tdunning.math.stats.TDigest;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.pig.Algebraic;
 import org.apache.pig.EvalFunc;
 import org.apache.pig.backend.executionengine.ExecException;
 import org.apache.pig.data.*;
 import org.apache.pig.impl.logicalLayer.schema.Schema;
 
-import static nl.basjes.pig.tdigest.Utils.unwrapTDigestFromTuple;
-import static nl.basjes.pig.tdigest.Utils.wrapTDigestIntoTuple;
-
 public class Merge extends EvalFunc<Tuple> implements Algebraic {
+  private static final Log LOG = LogFactory.getLog(Merge.class);
 
   public Tuple exec(Tuple input) throws IOException {
     if (input == null || input.size() == 0) {
       return null;
     }
 
-    return wrapTDigestIntoTuple(createDigest(input));
+    return Utils.wrapTDigestIntoTuple(createDigest(input));
   }
 
   // ==========================================================================
@@ -43,7 +43,7 @@ public class Merge extends EvalFunc<Tuple> implements Algebraic {
 
   static public class MergeTuplesIntoTDigest extends EvalFunc<Tuple> {
     public Tuple exec(Tuple input) throws IOException {
-      return wrapTDigestIntoTuple(createDigest(input));
+      return Utils.wrapTDigestIntoTuple(createDigest(input));
     }
   }
 
@@ -57,7 +57,8 @@ public class Merge extends EvalFunc<Tuple> implements Algebraic {
         for (Tuple tuple : values) {
           result = mergeSingleTuple(result, tuple);
         }
-      }; break;
+      }
+      break;
       default:
         result = mergeSingleTuple(result, input);
     }
@@ -65,6 +66,9 @@ public class Merge extends EvalFunc<Tuple> implements Algebraic {
   }
 
   private static TDigest mergeSingleTuple(TDigest tDigest, Tuple tuple) throws ExecException {
+    
+    LOG.error("MERGING THIS TUPLE" + tuple.toDelimitedString(";"));
+
     Object value = tuple.get(0);
     switch (tuple.getType(0)) {
       case DataType.INTEGER:
@@ -80,13 +84,23 @@ public class Merge extends EvalFunc<Tuple> implements Algebraic {
         tDigest.add((Double) value);
         break;
       case DataType.TUPLE:
-        TDigest tDigestFromTuple = unwrapTDigestFromTuple((Tuple) value);
+        TDigest tDigestFromTuple = Utils.unwrapTDigestFromTuple((Tuple) value);
         if (tDigestFromTuple != null) {
           tDigest.add(tDigestFromTuple);
           break;
         }
+        if (Utils.isTDigestTuple((Tuple) value)){
+          throw new ExecException("The tDigest tuple could not be unwrapped.");
+        }
         // Switch fallthrough if not a tDigest !!
       default:
+        // Perhaps the entire thing was a tDigest tuple?
+        tDigestFromTuple = Utils.unwrapTDigestFromTuple(tuple);
+        if (tDigestFromTuple != null) {
+          tDigest.add(tDigestFromTuple);
+          return tDigest;
+        }
+
         throw new ExecException("The datatype " + tuple.getType(0) +
                 "(="+ DataType.findTypeName(tuple.getType(0))+") cannot be merged into a tDigest.");
     }
@@ -95,13 +109,6 @@ public class Merge extends EvalFunc<Tuple> implements Algebraic {
 
   @Override
   public Schema outputSchema(Schema input) {
-    try {
-      Schema tupleSchema = new Schema();
-//      tupleSchema.add(new Schema.FieldSchema("magicValue", DataType.CHARARRAY));
-      tupleSchema.add(new Schema.FieldSchema("tDigest", DataType.TUPLE));
-      return tupleSchema;
-    } catch (Exception e) {
-      return null;
-    }
+    return Utils.getTDigestTupleSchema();
   }
 }
