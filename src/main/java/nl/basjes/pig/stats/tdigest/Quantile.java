@@ -13,11 +13,6 @@ import java.io.IOException;
 
 public class Quantile extends EvalFunc<Tuple> {
 
-  private void failExec() throws ExecException {
-    throw new ExecException(this.getClass().getCanonicalName() +
-            " needs two parameters: <TDigest Tuple> <Double>.");
-  }
-
   // We expect a TDigest tuple and a DOUBLE or FLOAT (between 0 and 1)
   public Tuple exec(Tuple input) throws IOException {
     TDigest tDigest = Utils.unwrapTDigestFromTuple((Tuple) input.get(0));

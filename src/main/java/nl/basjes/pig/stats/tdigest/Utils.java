@@ -23,8 +23,7 @@ public class Utils {
 
   // The purpose of the first one is ONLY to ensure we got a 'TDigest Tuple'
 
-  private static final String TDIGEST_TUPLE_MARKER = "@@ t-Digest @@ MAGIC @@";
-//  private static final Long TDIGEST_TUPLE_MARKER = 11668103115116L; // = ASCII Bytes 'tDgst' as Long
+  private static final Long TDIGEST_TUPLE_MARKER = 11668103115116L; // = ASCII Bytes 'tDgst' as Long
 
   static Tuple wrapTDigestIntoTuple(TDigest tDigest) throws ExecException {
     if (tDigest == null) {
@@ -49,13 +48,12 @@ public class Utils {
    */
   static boolean isTDigestTuple(Tuple tuple) throws ExecException {
     return (
-      tuple            != null                 &&
-      tuple.size()     == 2                    &&
-//      tuple.get(0)     == TDIGEST_TUPLE_MARKER &&
+      tuple != null &&
+      tuple.size() == 2 &&
       TDIGEST_TUPLE_MARKER.equals(tuple.get(0)) &&
-      tuple.getType(0) == DataType.CHARARRAY        &&
+      tuple.getType(0) == DataType.LONG &&
       tuple.getType(1) == DataType.BYTEARRAY
-      );
+    );
   }
 
   /**
@@ -82,7 +80,7 @@ public class Utils {
   static public Schema getTDigestTupleSchema() {
     try {
       Schema tupleSchema = new Schema();
-      tupleSchema.add(new Schema.FieldSchema("tDigestTuple",  getTDigestSchema(), DataType.TUPLE));
+      tupleSchema.add(new Schema.FieldSchema("tDigestTuple", getTDigestSchema(), DataType.TUPLE));
       return tupleSchema;
     } catch (Exception e) {
       return null;
@@ -92,7 +90,7 @@ public class Utils {
   static public Schema getTDigestSchema() {
     try {
       Schema tDigestSchema = new Schema();
-      tDigestSchema.add(new Schema.FieldSchema("magicValue", DataType.CHARARRAY));
+      tDigestSchema.add(new Schema.FieldSchema("magicValue", DataType.LONG));
       tDigestSchema.add(new Schema.FieldSchema("tDigest", DataType.BYTEARRAY));
       return tDigestSchema;
     } catch (Exception e) {
@@ -102,12 +100,14 @@ public class Utils {
 
   static public boolean isTDigestSchema(Schema.FieldSchema fieldSchema) {
     try {
-      if (fieldSchema.type != DataType.TUPLE) { return false;}
+      if (fieldSchema.type != DataType.TUPLE) {
+        return false;
+      }
       Schema schema = fieldSchema.schema;
-      if (schema.size() != 2) { return false;}
-      if (schema.getField(0).type != DataType.CHARARRAY) { return false;}
-      if (schema.getField(1).type != DataType.BYTEARRAY) { return false;}
-      return true;
+      return (
+            schema.size() == 2 &&
+            schema.getField(0).type == DataType.LONG &&
+            schema.getField(1).type == DataType.BYTEARRAY);
     } catch (Exception e) {
       return false;
     }
