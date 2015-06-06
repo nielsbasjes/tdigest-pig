@@ -18,12 +18,13 @@ public class Utils {
   private static final Log LOG = LogFactory.getLog(Utils.class);
 
   // The TDigest 'tuple' consists of two fields:
-  // - 0: chararray with the magic value 't-Digest'
+  // - 0: long with the magic value
   // - 1: bytearray which is the serialized TDigest
 
   // The purpose of the first one is ONLY to ensure we got a 'TDigest Tuple'
 
   private static final String TDIGEST_TUPLE_MARKER = "@@ t-Digest @@ MAGIC @@";
+//  private static final Long TDIGEST_TUPLE_MARKER = 11668103115116L; // = ASCII Bytes 'tDgst' as Long
 
   static Tuple wrapTDigestIntoTuple(TDigest tDigest) throws ExecException {
     if (tDigest == null) {
@@ -43,48 +44,28 @@ public class Utils {
   /**
    * Determine if this is a TDigest tuple
    *
-   * @param tuple
+   * @param tuple Is this really a tuple that contains a TDigest?
    * @return true if this tuple looks like a TDigest tuple
    */
   static boolean isTDigestTuple(Tuple tuple) throws ExecException {
-
-
-    if (tuple == null) {
-      LOG.error("Tuple is NOT tDigest: is NULL");
-      return false;
-    }
-    if (tuple.getType(0) != DataType.CHARARRAY) {
-      LOG.error("Tuple is NOT tDigest: First field is not chararray");
-      return false;
-    }
-    if (!TDIGEST_TUPLE_MARKER.equals(tuple.get(0))) {
-      LOG.error("Tuple is NOT tDigest: First field is not magic value");
-      return false;
-    }
-    if (tuple.getType(1) != DataType.BYTEARRAY) {
-      LOG.error("Tuple is NOT tDigest: Second field is not BYTEARRAY");
-      return false;
-    }
-
-    return true;
-//    return (
-//            tuple != null &&
-//            tuple.getType(0) == DataType.CHARARRAY &&
-//            TDIGEST_TUPLE_MARKER.equals(tuple.get(0)) &&
-//            tuple.getType(1) == DataType.BYTEARRAY
-//            );
+    return (
+      tuple            != null                 &&
+      tuple.size()     == 2                    &&
+//      tuple.get(0)     == TDIGEST_TUPLE_MARKER &&
+      TDIGEST_TUPLE_MARKER.equals(tuple.get(0)) &&
+      tuple.getType(0) == DataType.CHARARRAY        &&
+      tuple.getType(1) == DataType.BYTEARRAY
+      );
   }
 
   /**
    * Extracts the TDigest object from the tuple (iff present)
    *
-   * @param tuple
+   * @param tuple The tuple from which the TDigest datastructure needs to be extracted
    * @return TDigest block OR null if this is NOT a TDigest at all
    */
   static TDigest unwrapTDigestFromTuple(Tuple tuple) throws ExecException {
     if (!isTDigestTuple(tuple)) {
-      LOG.error("CANNOT UNWRAP");
-
       return null;
     }
 
@@ -100,17 +81,37 @@ public class Utils {
 
   static public Schema getTDigestTupleSchema() {
     try {
-      Schema tDigestSchema = new Schema();
-      tDigestSchema.add(new Schema.FieldSchema("magicValue", DataType.CHARARRAY));
-      tDigestSchema.add(new Schema.FieldSchema("tDigest", DataType.BYTEARRAY));
-
       Schema tupleSchema = new Schema();
-      tupleSchema.add(new Schema.FieldSchema("tDigestTuple", tDigestSchema, DataType.TUPLE));
-      LOG.error("SOMEONE WANTED THE SCHEMA");
+      tupleSchema.add(new Schema.FieldSchema("tDigestTuple",  getTDigestSchema(), DataType.TUPLE));
       return tupleSchema;
     } catch (Exception e) {
       return null;
     }
   }
+
+  static public Schema getTDigestSchema() {
+    try {
+      Schema tDigestSchema = new Schema();
+      tDigestSchema.add(new Schema.FieldSchema("magicValue", DataType.CHARARRAY));
+      tDigestSchema.add(new Schema.FieldSchema("tDigest", DataType.BYTEARRAY));
+      return tDigestSchema;
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  static public boolean isTDigestSchema(Schema.FieldSchema fieldSchema) {
+    try {
+      if (fieldSchema.type != DataType.TUPLE) { return false;}
+      Schema schema = fieldSchema.schema;
+      if (schema.size() != 2) { return false;}
+      if (schema.getField(0).type != DataType.CHARARRAY) { return false;}
+      if (schema.getField(1).type != DataType.BYTEARRAY) { return false;}
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
 
 }

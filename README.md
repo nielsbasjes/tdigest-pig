@@ -4,6 +4,13 @@ T-Digest Pig UDF
 This is simply a pig wrapper around [T-Digest](https://github.com/tdunning/t-digest) 
 which was created by [Ted Dunning](https://twitter.com/ted_dunning).
 
+Concept of the UDF:
+-----
+You first feed al of your numbers into the Merge method.
+This creates a specially structured Tuple that contains the entire TDigest datastructure.
+After this has been aggregated then you can query multiple quantile values from this single datastructure.
+So this means the tdigest only needs to be constructed once for a set of numbers.
+
 Build:
 ------
 
