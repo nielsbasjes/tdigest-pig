@@ -5,25 +5,21 @@ import org.apache.pig.EvalFunc;
 import org.apache.pig.backend.executionengine.ExecException;
 import org.apache.pig.data.DataType;
 import org.apache.pig.data.Tuple;
-import org.apache.pig.data.TupleFactory;
 import org.apache.pig.impl.logicalLayer.schema.Schema;
 import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
 
 import java.io.IOException;
 
-public class Quantile extends EvalFunc<Tuple> {
+public class Quantile extends EvalFunc<Double> {
 
   // We expect a TDigest tuple and a DOUBLE or FLOAT (between 0 and 1)
-  public Tuple exec(Tuple input) throws IOException {
+  public Double exec(Tuple input) throws IOException {
     TDigest tDigest = Utils.unwrapTDigestFromTuple((Tuple) input.get(0));
     if (tDigest == null) {
       throw new ExecException("The first parameter was NOT a tDigest tuple.");
     }
 
-    Tuple output = TupleFactory.getInstance().newTuple(1);
-    output.set(0, tDigest.quantile((Double) input.get(1)));
-
-    return output;
+    return tDigest.quantile((Double) input.get(1));
   }
 
   @Override

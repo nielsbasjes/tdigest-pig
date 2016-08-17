@@ -3,7 +3,6 @@ package nl.basjes.pig.stats.tdigest;
 import org.apache.pig.ExecType;
 import org.apache.pig.PigServer;
 import org.apache.pig.builtin.mock.Storage;
-import org.apache.pig.data.DataType;
 import org.apache.pig.data.Tuple;
 import org.junit.Test;
 
@@ -62,29 +61,13 @@ public class TestTDigestUDF {
     // Check the result
     assertTrue("Too many records", out.size() == 1);
 
-    byte fieldType;
     Tuple tuple = out.get(0);
 
-    fieldType = ((Tuple) tuple.get(0)).getType(0);
-    assertEquals("Bad data type for Q90: " + DataType.findTypeName(fieldType), fieldType, DataType.DOUBLE);
-
-    fieldType = ((Tuple) tuple.get(1)).getType(0);
-    assertEquals("Bad data type for Q75: " + DataType.findTypeName(fieldType), fieldType, DataType.DOUBLE);
-
-    fieldType = ((Tuple) tuple.get(2)).getType(0);
-    assertEquals("Bad data type for Q50: " + DataType.findTypeName(fieldType), fieldType, DataType.DOUBLE);
-
-    fieldType = ((Tuple) tuple.get(3)).getType(0);
-    assertEquals("Bad data type for Q25: " + DataType.findTypeName(fieldType), fieldType, DataType.DOUBLE);
-
-    fieldType = ((Tuple) tuple.get(4)).getType(0);
-    assertEquals("Bad data type for Q10: " + DataType.findTypeName(fieldType), fieldType, DataType.DOUBLE);
-
-    assertEquals("Bad data Q90", (Double) ((Tuple) tuple.get(0)).get(0), 4.60D, 0.1D);
-    assertEquals("Bad data Q75", (Double) ((Tuple) tuple.get(1)).get(0), 4.00D, 0.1D);
-    assertEquals("Bad data Q50", (Double) ((Tuple) tuple.get(2)).get(0), 3.00D, 0.1D);
-    assertEquals("Bad data Q25", (Double) ((Tuple) tuple.get(3)).get(0), 2.00D, 0.1D);
-    assertEquals("Bad data Q10", (Double) ((Tuple) tuple.get(4)).get(0), 1.40D, 0.1D);
+    assertEquals("Bad data Q90", (Double) tuple.get(0), 4.60D, 0.1D);
+    assertEquals("Bad data Q75", (Double) tuple.get(1), 4.00D, 0.1D);
+    assertEquals("Bad data Q50", (Double) tuple.get(2), 3.00D, 0.1D);
+    assertEquals("Bad data Q25", (Double) tuple.get(3), 2.00D, 0.1D);
+    assertEquals("Bad data Q10", (Double) tuple.get(4), 1.40D, 0.1D);
   }
 
 }
