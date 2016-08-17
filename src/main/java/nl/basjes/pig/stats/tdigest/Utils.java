@@ -13,7 +13,7 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 
 import java.nio.ByteBuffer;
 
-public class Utils {
+class Utils {
   // ==========================================================================
   private static final Log LOG = LogFactory.getLog(Utils.class);
 
@@ -46,7 +46,7 @@ public class Utils {
    * @param tuple Is this really a tuple that contains a TDigest?
    * @return true if this tuple looks like a TDigest tuple
    */
-  static boolean isTDigestTuple(Tuple tuple) throws ExecException {
+  private static boolean isTDigestTuple(Tuple tuple) throws ExecException {
     return (
       tuple != null &&
       tuple.size() == 2 &&
@@ -77,7 +77,7 @@ public class Utils {
   }
 
 
-  static public Schema getTDigestTupleSchema() {
+  static Schema getTDigestTupleSchema() {
     try {
       Schema tupleSchema = new Schema();
       tupleSchema.add(new Schema.FieldSchema("tDigestTuple", getTDigestSchema(), DataType.TUPLE));
@@ -87,7 +87,7 @@ public class Utils {
     }
   }
 
-  static public Schema getTDigestSchema() {
+  private static Schema getTDigestSchema() {
     try {
       Schema tDigestSchema = new Schema();
       tDigestSchema.add(new Schema.FieldSchema("magicValue", DataType.LONG));
@@ -98,7 +98,7 @@ public class Utils {
     }
   }
 
-  static public boolean isTDigestSchema(Schema.FieldSchema fieldSchema) {
+  static boolean isTDigestSchema(Schema.FieldSchema fieldSchema) {
     try {
       if (fieldSchema.type != DataType.TUPLE) {
         return false;

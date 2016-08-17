@@ -1,15 +1,15 @@
 package nl.basjes.pig.stats.tdigest;
 
-import java.io.IOException;
-
 import com.tdunning.math.stats.TDigest;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.pig.Algebraic;
 import org.apache.pig.EvalFunc;
 import org.apache.pig.backend.executionengine.ExecException;
-import org.apache.pig.data.*;
+import org.apache.pig.data.DataBag;
+import org.apache.pig.data.DataType;
+import org.apache.pig.data.Tuple;
 import org.apache.pig.impl.logicalLayer.schema.Schema;
+
+import java.io.IOException;
 
 public class Merge extends EvalFunc<Tuple> implements Algebraic {
 
