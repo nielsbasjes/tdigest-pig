@@ -16,7 +16,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.build.outputEncoding>UTF-8</project.build.outputEncoding>
 
-    <hadoop.version>2.7.2</hadoop.version>
+    <hadoop.version>2.10.1</hadoop.version>
     <pig.version>0.16.0</pig.version>
   </properties>
 
